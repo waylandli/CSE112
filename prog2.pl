@@ -55,6 +55,17 @@ flight( lax, sjc, time( 19,30 ) ).
 flight( lax, sfo, time( 20, 0 ) ).
 flight( lax, sea, time( 22,30 ) ).
 
+haversine(LatD1, LatM1, LatD2, LatM2, LonD1, LonM1, LonD2, LonM2, Distance) :-
+    degToRad(LatD1, LatM1, Lat1),
+    degToRad(LatD2, LatM2, Lat2),
+    degToRad(LonD1, LonM1, Lon1),
+    degToRad(LonD2, LonM2, Lon2),
+    Lon3 is Lon2 - Lon1,
+    Lat3 is Lat2 - Lat1,
+    A is sin(Lat3/2)**2 + cos(Lat1) * cos(Lat2) * sin(Lon3/2)**2,
+    C is 2 * atan( sqrt(A), sqrt(1-A) ),
+    Distance is C * 3956.
+
 degToRad(D,M,Rad) :-
     InitOperation is M rdiv 60,
     Addition is D+InitOperation,
