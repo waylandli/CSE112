@@ -55,6 +55,12 @@ flight( lax, sjc, time( 19,30 ) ).
 flight( lax, sfo, time( 20, 0 ) ).
 flight( lax, sea, time( 22,30 ) ).
 
+degToRad(D,M,Rad) :-
+    InitOperation is M rdiv 60,
+    Addition is D+InitOperation,
+    Numerator is Addition*pi,
+    Rad is Numerator rdiv 180 + 0.00.
+
 print_trip( Action, Code, Name, time( Hour, Minute)) :-
    upcase_atom( Code, Upper_code),
    format( "~6s  ~3s  ~s~26|  ~02d:~02d",
@@ -67,10 +73,16 @@ test :-
 
 doSomething(nyc,lax) :- test.
 
-fly(A,B) :- flight(A,B,_),
-    		    airport(A, X, _, _), print_trip(depart, A, X, time( 9,30)),
-            airport(B, X1, _, _), print_trip(arrive, B, X1, time( 0,0)).
+/* Direct Flight from A to B */
+fly(A,B) :- flight(A,B,T),
+    		    airport(A, X, degmin(Deg,Min), degmin(Deg2,Min2)),
+    		    print_trip(depart, A, X, T),
+            airport(B, X1, degmin(Deg3,Min3), degmin(Deg4,Min4)),
 
-fly(A,C) :- print_trip(depart, A, 'random', time(0,0)).
+    		    print_trip(arrive, B, X1, time( 0,0)).
+
+/* Attempting to do flight paths with multiple stops*/
+fly(A,_) :- flight( A, X, _, _), fly(X,B)
+fly(_,B) :- print_trip(arrive, B, 'random', time(0,0)).
 
 main :- read(A),read(B), fly(A,B).
